@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Assignment 04</title>
+</head>
+<body>
+    <h1>Slide App</h1>
+    <h2>Markdown Editor</h2>
+    <textarea id="mdfile" rows="25" cols="35"># My First Slide. 
+This is my presentation.
+My name is AbdulWahab.
+---
+
+# My Second Slide
+Second slide Test.
+
+---
+
+# My Third Slide
+Third slide Test.</textarea>
+
+    <h2>Slides</h2>
+    <div id="slide">
+        <h1>My First Slide</h1>
+        <p>Welcome!</p>
+    </div>
+    <button id="left">Left</button>
+    <button id="right">Right</button>
+    <button id="fullscreen">Fullscreen</button>
+    <button id="save">Save</button>
+    <p id="count">1 / 3</p>
+</body>
+
+<script>
+let mdfile = document.getElementById("mdfile");
+let slide = document.getElementById("slide");
+let left = document.getElementById("left");
+let right = document.getElementById("right");
+let count = document.getElementById("count");
+let fullscreen = document.getElementById("fullscreen");
+let save = document.getElementById("save");
+let current = 0;
+let slides = [];
+
+function createSlides() 
+{
+    let text = mdfile.value;
+    slides = text.split("---");
+    for (let i = 0; i < slides.length; i++) 
+    {
+        slides[i] = slides[i].trim();
+    }
+    current = 0;
+    showSlide();
+}
+
+function showSlide() 
+{
+    let data = slides[current];
+    let lines = data.split("\n");
+    let text = "";
+    for (let i = 0; i < lines.length; i++) 
+    {
+        if (lines[i].startsWith("#")) 
+        {
+            text = text + "<h1>" + lines[i]+ "</h1>";
+        }
+        else if (lines[i].trim() != "")
+        {
+            text = text + "<p>" + lines[i] + "</p>";
+        }
+    }
+    slide.innerHTML = text;
+    count.innerHTML = (current + 1) + " / 3";
+    left.disabled = (current == 0);
+    right.disabled = (current == 2);
+
+}
+right.addEventListener("click", function() 
+{
+    if (current < 2) 
+    {
+        current++;
+        showSlide();
+    }
+});
+left.addEventListener("click", function() 
+{
+    if (current > 0) 
+    {
+        current--;
+        showSlide();
+    }
+});
+mdfile.addEventListener("input", function() 
+{
+    createSlides();
+});
+fullscreen.addEventListener("click", function() 
+{
+    if (document.fullscreenElement == null) 
+    {
+        document.documentElement.requestFullscreen();
+        fullscreen.innerHTML = "Exit Fullscreen";
+    }
+    else 
+    {
+        document.exitFullscreen();
+        fullscreen.innerHTML = "Fullscreen";
+    }
+});
+document.addEventListener("keydown", function(event) 
+{
+    if (event.key == "ArrowRight") 
+    {
+        if (current < 2) 
+        {
+            current++;
+            showSlide();
+        }
+    }
+    else if (event.key == "ArrowLeft") 
+    {
+        if (current > 0) 
+        {
+            current--;
+            showSlide();
+        }
+    }
+    else if (event.key == "F11") 
+    {
+        event.preventDefault();
+        if (document.fullscreenElement == null) 
+        {
+            document.documentElement.requestFullscreen();
+        }
+        else 
+        {
+            document.exitFullscreen();
+        }
+    }
+});
+save.addEventListener("click", function() 
+{
+    localStorage.setItem("myslides", mdfile.value);
+    alert("Slides Saved!");
+});
+let saved = localStorage.getItem("myslides");
+if (saved != null) 
+{
+    mdfile.value = saved;
+}
+createSlides();
+</script>
+</html>
